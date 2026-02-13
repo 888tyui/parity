@@ -53,3 +53,11 @@ model AgentAnalysis {
   contractId String
   contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
 }
+
+model Waitlist {
+  id        Int      @id @default(autoincrement())
+  wallet    String   @unique
+  email     String
+  path      String?
+  createdAt DateTime @default(now())
+}

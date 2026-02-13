@@ -122,9 +122,10 @@ function CheckIcon({ className }: { className?: string }) {
 interface WorkflowEngineProps {
   path: UserPath;
   onReset: () => void;
+  onConnectWallet?: () => void;
 }
 
-export default function WorkflowEngine({ path, onReset }: WorkflowEngineProps) {
+export default function WorkflowEngine({ path, onReset, onConnectWallet }: WorkflowEngineProps) {
   const steps = useMemo(() => pathSteps[path], [path]);
 
   const [state, dispatch] = useReducer(reducer, {
@@ -388,7 +389,10 @@ export default function WorkflowEngine({ path, onReset }: WorkflowEngineProps) {
                 </svg>
               </button>
             ) : (
-              <button className="group flex items-center gap-2 px-5 py-2.5 text-xs font-[family-name:var(--font-dm-sans)] font-medium bg-blue-primary text-white rounded-lg hover:bg-blue-deep transition-all shadow-[0_2px_8px_rgba(52,84,209,0.25)] hover:shadow-[0_4px_16px_rgba(52,84,209,0.35)] active:scale-[0.97]">
+              <button
+                onClick={onConnectWallet}
+                className="group flex items-center gap-2 px-5 py-2.5 text-xs font-[family-name:var(--font-dm-sans)] font-medium bg-blue-primary text-white rounded-lg hover:bg-blue-deep transition-all shadow-[0_2px_8px_rgba(52,84,209,0.25)] hover:shadow-[0_4px_16px_rgba(52,84,209,0.35)] active:scale-[0.97]"
+              >
                 <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <rect x="2" y="4" width="12" height="10" rx="2" />
                   <path d="M5 4V3a3 3 0 016 0v1" />
