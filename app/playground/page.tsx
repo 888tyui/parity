@@ -1,11 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import type { UserPath } from "@/types/playground";
 import SelectionScreen from "@/components/playground/SelectionScreen";
 import WorkflowEngine from "@/components/playground/WorkflowEngine";
-import SolanaWalletProvider from "@/components/playground/SolanaWalletProvider";
-import WaitlistFlow from "@/components/playground/WaitlistFlow";
+
+const WaitlistModal = dynamic(
+  () => import("@/components/playground/WaitlistModal"),
+  { ssr: false },
+);
 
 export default function PlaygroundPage() {
   const [selectedPath, setSelectedPath] = useState<UserPath | null>(null);
@@ -23,12 +27,10 @@ export default function PlaygroundPage() {
         onConnectWallet={() => setShowWaitlist(true)}
       />
       {showWaitlist && (
-        <SolanaWalletProvider>
-          <WaitlistFlow
-            path={selectedPath}
-            onClose={() => setShowWaitlist(false)}
-          />
-        </SolanaWalletProvider>
+        <WaitlistModal
+          path={selectedPath}
+          onClose={() => setShowWaitlist(false)}
+        />
       )}
     </>
   );
