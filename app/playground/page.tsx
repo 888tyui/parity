@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { UserPath } from "@/types/playground";
 import SelectionScreen from "@/components/playground/SelectionScreen";
 import WorkflowEngine from "@/components/playground/WorkflowEngine";
+import SolanaWalletProvider from "@/components/playground/SolanaWalletProvider";
 import WaitlistFlow from "@/components/playground/WaitlistFlow";
 
 export default function PlaygroundPage() {
@@ -22,10 +23,12 @@ export default function PlaygroundPage() {
         onConnectWallet={() => setShowWaitlist(true)}
       />
       {showWaitlist && (
-        <WaitlistFlow
-          path={selectedPath}
-          onClose={() => setShowWaitlist(false)}
-        />
+        <SolanaWalletProvider>
+          <WaitlistFlow
+            path={selectedPath}
+            onClose={() => setShowWaitlist(false)}
+          />
+        </SolanaWalletProvider>
       )}
     </>
   );
