@@ -49,8 +49,9 @@ export default function AnalysisStep({ path, onNext, onAnimating, onAnalysisComp
     // Log entries
     const logTimer = setInterval(() => {
       if (logIndex < allLogs.length) {
-        setLogs((prev) => [...prev, allLogs[logIndex]]);
+        const entry = allLogs[logIndex];
         logIndex++;
+        setLogs((prev) => [...prev, entry]);
       } else {
         clearInterval(logTimer);
       }
