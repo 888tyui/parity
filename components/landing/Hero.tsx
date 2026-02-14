@@ -134,7 +134,7 @@ export default function Hero() {
               transition={{ duration: 0.6 }}
             >
               <a href="https://www.ammchallenge.com/prop-amm" target="_blank" rel="noopener noreferrer" className="inline-block hover:opacity-80 transition-opacity">
-                <Badge>Prop AMM Leaderboard #1 <span className="text-green-600">(+500.19)</span></Badge>
+                <Badge>Prop AMM Leaderboard #1 <span className="text-green-600">(+519.32)</span></Badge>
               </a>
             </motion.div>
 
