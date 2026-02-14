@@ -16,13 +16,20 @@ interface WaitlistFlowProps {
 }
 
 export default function WaitlistFlow({ path, onClose }: WaitlistFlowProps) {
-  const { publicKey, connected, disconnect } = useWallet();
+  const { publicKey, connected, disconnect, wallet, connect } = useWallet();
   const { setVisible } = useWalletModal();
   const [phase, setPhase] = useState<Phase>("connect");
   const [email, setEmail] = useState("");
   const [position, setPosition] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Trigger connect when wallet is selected from modal
+  useEffect(() => {
+    if (wallet && !connected) {
+      connect().catch(() => {});
+    }
+  }, [wallet, connected, connect]);
 
   // Auto-advance to feedback when wallet connects
   useEffect(() => {
