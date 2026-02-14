@@ -7,6 +7,7 @@ import Link from "next/link";
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [showGithubToast, setShowGithubToast] = useState(false);
+  const [showPrtToast, setShowPrtToast] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -18,6 +19,11 @@ export default function Navbar() {
     e.preventDefault();
     setShowGithubToast(true);
     setTimeout(() => setShowGithubToast(false), 3000);
+  };
+
+  const handlePrtClick = () => {
+    setShowPrtToast(true);
+    setTimeout(() => setShowPrtToast(false), 3000);
   };
 
   return (
@@ -88,6 +94,12 @@ export default function Navbar() {
             >
               Docs
             </Link>
+            <button
+              onClick={handlePrtClick}
+              className="nav-link text-sm text-blue-primary hover:text-blue-deep transition-colors duration-300 font-[family-name:var(--font-cs-caleb-mono)] cursor-pointer"
+            >
+              $PRT
+            </button>
           </div>
         </div>
       </div>
@@ -96,6 +108,14 @@ export default function Navbar() {
         <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 glass-strong rounded-lg px-5 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.08)] animate-fade-in-up">
           <p className="text-sm text-text-primary font-[family-name:var(--font-dm-sans)] whitespace-nowrap">
             Open source materials will be available soon.
+          </p>
+        </div>
+      )}
+      {/* $PRT toast */}
+      {showPrtToast && (
+        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 glass-strong rounded-lg px-5 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.08)] animate-fade-in-up">
+          <p className="text-sm text-text-primary font-[family-name:var(--font-dm-sans)] whitespace-nowrap">
+            $PRT token details will be announced soon.
           </p>
         </div>
       )}
