@@ -128,7 +128,6 @@ export default function Hero() {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left: Text Content */}
           <div className="relative z-10">
-            {/* Badge — temporarily hidden
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -138,7 +137,6 @@ export default function Hero() {
                 <Badge>Prop AMM Leaderboard #4</Badge>
               </a>
             </motion.div>
-            */}
 
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
