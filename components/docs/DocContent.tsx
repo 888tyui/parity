@@ -2,13 +2,13 @@ import Link from "next/link";
 
 export default function DocContent() {
   return (
-    <article className="flex-1 max-w-3xl px-8 py-12">
+    <article className="flex-1 max-w-3xl px-4 sm:px-8 py-8 sm:py-12 pt-16 lg:pt-12">
       {/* ============================================
           SECTION 1 — Introduction
           ============================================ */}
       <h1
         id="introduction"
-        className="font-[family-name:var(--font-instrument-serif)] text-4xl text-text-primary leading-tight"
+        className="font-[family-name:var(--font-instrument-serif)] text-3xl sm:text-4xl text-text-primary leading-tight"
       >
         Introduction
       </h1>
@@ -20,7 +20,7 @@ export default function DocContent() {
       </p>
 
       {/* At a Glance — 4 pillar cards */}
-      <div className="grid grid-cols-2 gap-4 mt-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
         {[
           {
             title: "Playground",
@@ -65,8 +65,8 @@ export default function DocContent() {
         Installation
       </h2>
 
-      <div className="mt-4 glass-blue rounded-lg px-4 py-3 flex items-center gap-3">
-        <span className="shrink-0 px-2 py-0.5 rounded text-[10px] font-[family-name:var(--font-cs-caleb-mono)] uppercase tracking-wider bg-blue-primary text-white">
+      <div className="mt-4 glass-blue rounded-lg px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+        <span className="shrink-0 self-start px-2 py-0.5 rounded text-[10px] font-[family-name:var(--font-cs-caleb-mono)] uppercase tracking-wider bg-blue-primary text-white">
           Coming Soon
         </span>
         <p className="text-sm text-text-secondary font-[family-name:var(--font-dm-sans)]">
@@ -143,7 +143,7 @@ console.log(result.summary);   // human-readable summary`}</pre>
       </div>
 
       {/* 3 step cards */}
-      <div className="grid grid-cols-3 gap-4 mt-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
         {[
           {
             step: "01",
@@ -197,14 +197,14 @@ console.log(result.summary);   // human-readable summary`}</pre>
       </p>
 
       {/* Built-in skills table */}
-      <div className="mt-6 overflow-hidden rounded-xl border border-white/40 glass-card">
-        <table className="w-full text-sm">
+      <div className="mt-6 overflow-x-auto rounded-xl border border-white/40 glass-card">
+        <table className="w-full text-sm min-w-[400px]">
           <thead>
             <tr className="border-b border-white/30">
-              <th className="px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
+              <th className="px-4 sm:px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
                 Skill
               </th>
-              <th className="px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
+              <th className="px-4 sm:px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
                 Description
               </th>
             </tr>
@@ -234,12 +234,12 @@ console.log(result.summary);   // human-readable summary`}</pre>
                   i < 3 ? "border-b border-white/20" : ""
                 }
               >
-                <td className="px-5 py-3">
+                <td className="px-4 sm:px-5 py-3">
                   <code className="text-blue-primary font-[family-name:var(--font-cs-caleb-mono)] text-xs">
                     {skill.name}
                   </code>
                 </td>
-                <td className="px-5 py-3 text-text-secondary text-sm">
+                <td className="px-4 sm:px-5 py-3 text-text-secondary text-sm">
                   {skill.desc}
                 </td>
               </tr>
@@ -255,7 +255,7 @@ console.log(result.summary);   // human-readable summary`}</pre>
         Parity skills are accessible from any AI coding agent through standard
         integration points:
       </p>
-      <div className="grid grid-cols-2 gap-3 mt-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
         {[
           { agent: "Claude Code", method: "MCP server" },
           { agent: "Cursor", method: ".cursorrules" },
@@ -405,7 +405,7 @@ Analyze the provided Solana program for security vulnerabilities.
             key={layer.layer}
             className="glass-card rounded-xl p-6 depth-card"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div>
                 <span className="font-[family-name:var(--font-cs-caleb-mono)] text-xs text-blue-primary uppercase tracking-wider">
                   {layer.layer}
@@ -414,7 +414,7 @@ Analyze the provided Solana program for security vulnerabilities.
                   {layer.title}
                 </h4>
               </div>
-              <span className="glass rounded-full px-3 py-1 text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary">
+              <span className="self-start sm:self-auto glass rounded-full px-3 py-1 text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary">
                 {layer.stat}
               </span>
             </div>
@@ -431,14 +431,14 @@ Analyze the provided Solana program for security vulnerabilities.
       <p className="mt-3 text-sm text-text-secondary leading-relaxed font-[family-name:var(--font-dm-sans)]">
         Patterns the Context Engine detects include:
       </p>
-      <div className="mt-4 overflow-hidden rounded-xl border border-white/40 glass-card">
-        <table className="w-full text-sm">
+      <div className="mt-4 overflow-x-auto rounded-xl border border-white/40 glass-card">
+        <table className="w-full text-sm min-w-[400px]">
           <thead>
             <tr className="border-b border-white/30">
-              <th className="px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
+              <th className="px-4 sm:px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
                 Pattern
               </th>
-              <th className="px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
+              <th className="px-4 sm:px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
                 Risk
               </th>
             </tr>
@@ -458,10 +458,10 @@ Analyze the provided Solana program for security vulnerabilities.
                 key={item.pattern}
                 className={i < 7 ? "border-b border-white/20" : ""}
               >
-                <td className="px-5 py-2.5 text-text-primary text-sm">
+                <td className="px-4 sm:px-5 py-2.5 text-text-primary text-sm">
                   {item.pattern}
                 </td>
-                <td className="px-5 py-2.5">
+                <td className="px-4 sm:px-5 py-2.5">
                   <span
                     className={`inline-block px-2 py-0.5 rounded text-xs font-[family-name:var(--font-cs-caleb-mono)] ${
                       item.risk === "Critical"
@@ -497,7 +497,7 @@ Analyze the provided Solana program for security vulnerabilities.
       </p>
 
       {/* 6 feature grid */}
-      <div className="grid grid-cols-3 gap-3 mt-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-6">
         {[
           {
             title: "Editor",
@@ -766,8 +766,8 @@ interface Finding {
         SDK Overview
       </h2>
 
-      <div className="mt-4 glass-blue rounded-lg px-4 py-3 flex items-center gap-3">
-        <span className="shrink-0 px-2 py-0.5 rounded text-[10px] font-[family-name:var(--font-cs-caleb-mono)] uppercase tracking-wider bg-blue-primary text-white">
+      <div className="mt-4 glass-blue rounded-lg px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+        <span className="shrink-0 self-start px-2 py-0.5 rounded text-[10px] font-[family-name:var(--font-cs-caleb-mono)] uppercase tracking-wider bg-blue-primary text-white">
           Coming Soon
         </span>
         <p className="text-sm text-text-secondary font-[family-name:var(--font-dm-sans)]">
@@ -793,14 +793,14 @@ const client = new Parity({
       <h3 className="font-[family-name:var(--font-cs-caleb-mono)] text-base text-text-primary mt-8">
         Available Methods
       </h3>
-      <div className="mt-4 overflow-hidden rounded-xl border border-white/40 glass-card">
-        <table className="w-full text-sm">
+      <div className="mt-4 overflow-x-auto rounded-xl border border-white/40 glass-card">
+        <table className="w-full text-sm min-w-[400px]">
           <thead>
             <tr className="border-b border-white/30">
-              <th className="px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
+              <th className="px-4 sm:px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
                 Method
               </th>
-              <th className="px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
+              <th className="px-4 sm:px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
                 Description
               </th>
             </tr>
@@ -828,12 +828,12 @@ const client = new Parity({
                 key={item.method}
                 className={i < 3 ? "border-b border-white/20" : ""}
               >
-                <td className="px-5 py-3">
+                <td className="px-4 sm:px-5 py-3">
                   <code className="text-blue-primary font-[family-name:var(--font-cs-caleb-mono)] text-xs">
                     {item.method}
                   </code>
                 </td>
-                <td className="px-5 py-3 text-text-secondary text-sm">
+                <td className="px-4 sm:px-5 py-3 text-text-secondary text-sm">
                   {item.desc}
                 </td>
               </tr>
@@ -864,20 +864,20 @@ const client = new Parity({
       <p className="mt-3 text-sm text-text-secondary leading-relaxed font-[family-name:var(--font-dm-sans)]">
         Analyze a Solana program with one or more skills.
       </p>
-      <div className="mt-4 overflow-hidden rounded-xl border border-white/40 glass-card">
-        <table className="w-full text-sm">
+      <div className="mt-4 overflow-x-auto rounded-xl border border-white/40 glass-card">
+        <table className="w-full text-sm min-w-[500px]">
           <thead>
             <tr className="border-b border-white/30">
-              <th className="px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
+              <th className="px-4 sm:px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
                 Parameter
               </th>
-              <th className="px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
+              <th className="px-4 sm:px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
                 Type
               </th>
-              <th className="px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
+              <th className="px-4 sm:px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
                 Required
               </th>
-              <th className="px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
+              <th className="px-4 sm:px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
                 Description
               </th>
             </tr>
@@ -913,20 +913,20 @@ const client = new Parity({
                 key={row.param}
                 className={i < 3 ? "border-b border-white/20" : ""}
               >
-                <td className="px-5 py-2.5">
+                <td className="px-4 sm:px-5 py-2.5">
                   <code className="text-blue-primary font-[family-name:var(--font-cs-caleb-mono)] text-xs">
                     {row.param}
                   </code>
                 </td>
-                <td className="px-5 py-2.5">
+                <td className="px-4 sm:px-5 py-2.5">
                   <code className="font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary">
                     {row.type}
                   </code>
                 </td>
-                <td className="px-5 py-2.5 text-text-secondary text-xs">
+                <td className="px-4 sm:px-5 py-2.5 text-text-secondary text-xs">
                   {row.required}
                 </td>
-                <td className="px-5 py-2.5 text-text-secondary text-sm">
+                <td className="px-4 sm:px-5 py-2.5 text-text-secondary text-sm">
                   {row.desc}
                 </td>
               </tr>
@@ -1011,8 +1011,8 @@ const client = new Parity({
         CI/CD Integration
       </h2>
 
-      <div className="mt-4 glass-blue rounded-lg px-4 py-3 flex items-center gap-3">
-        <span className="shrink-0 px-2 py-0.5 rounded text-[10px] font-[family-name:var(--font-cs-caleb-mono)] uppercase tracking-wider bg-blue-primary text-white">
+      <div className="mt-4 glass-blue rounded-lg px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+        <span className="shrink-0 self-start px-2 py-0.5 rounded text-[10px] font-[family-name:var(--font-cs-caleb-mono)] uppercase tracking-wider bg-blue-primary text-white">
           Coming Soon
         </span>
         <p className="text-sm text-text-secondary font-[family-name:var(--font-dm-sans)]">
@@ -1092,17 +1092,17 @@ console.log("Analysis passed:", result.summary);`}</pre>
       <h3 className="font-[family-name:var(--font-cs-caleb-mono)] text-base text-text-primary mt-8">
         CLI Options
       </h3>
-      <div className="mt-4 overflow-hidden rounded-xl border border-white/40 glass-card">
-        <table className="w-full text-sm">
+      <div className="mt-4 overflow-x-auto rounded-xl border border-white/40 glass-card">
+        <table className="w-full text-sm min-w-[500px]">
           <thead>
             <tr className="border-b border-white/30">
-              <th className="px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
+              <th className="px-4 sm:px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
                 Flag
               </th>
-              <th className="px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
+              <th className="px-4 sm:px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
                 Description
               </th>
-              <th className="px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
+              <th className="px-4 sm:px-5 py-3 text-left font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary uppercase tracking-wider">
                 Default
               </th>
             </tr>
@@ -1139,15 +1139,15 @@ console.log("Analysis passed:", result.summary);`}</pre>
                 key={row.flag}
                 className={i < 4 ? "border-b border-white/20" : ""}
               >
-                <td className="px-5 py-2.5">
+                <td className="px-4 sm:px-5 py-2.5">
                   <code className="text-blue-primary font-[family-name:var(--font-cs-caleb-mono)] text-xs">
                     {row.flag}
                   </code>
                 </td>
-                <td className="px-5 py-2.5 text-text-secondary text-sm">
+                <td className="px-4 sm:px-5 py-2.5 text-text-secondary text-sm">
                   {row.desc}
                 </td>
-                <td className="px-5 py-2.5">
+                <td className="px-4 sm:px-5 py-2.5">
                   <code className="font-[family-name:var(--font-cs-caleb-mono)] text-xs text-text-secondary">
                     {row.def}
                   </code>

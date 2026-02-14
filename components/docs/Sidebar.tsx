@@ -43,7 +43,11 @@ const sections: NavSection[] = [
   },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  onNavigate?: () => void;
+}
+
+export default function Sidebar({ onNavigate }: SidebarProps) {
   const [openSections, setOpenSections] = useState<string[]>(
     sections.map((s) => s.title)
   );
@@ -55,18 +59,31 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 shrink-0 border-r border-white/20 glass-strong overflow-y-auto" data-lenis-prevent>
-      <div className="p-6">
-        {/* Brand */}
-        <Link
-          href="/"
-          className="font-[family-name:var(--font-cs-caleb-mono)] text-xs tracking-[0.2em] text-text-secondary hover:text-blue-primary transition-colors"
-        >
-          PARITY
-        </Link>
-        <h2 className="mt-1 font-[family-name:var(--font-cs-caleb-mono)] text-sm text-text-primary">
-          Documentation
-        </h2>
+    <aside className="w-64 h-full shrink-0 border-r border-white/20 glass-strong overflow-y-auto" data-lenis-prevent>
+      <div className="p-6 flex items-center justify-between">
+        <div>
+          <Link
+            href="/"
+            className="font-[family-name:var(--font-cs-caleb-mono)] text-xs tracking-[0.2em] text-text-secondary hover:text-blue-primary transition-colors"
+          >
+            PARITY
+          </Link>
+          <h2 className="mt-1 font-[family-name:var(--font-cs-caleb-mono)] text-sm text-text-primary">
+            Documentation
+          </h2>
+        </div>
+        {/* Mobile close */}
+        {onNavigate && (
+          <button
+            onClick={onNavigate}
+            className="lg:hidden p-1 text-text-secondary hover:text-text-primary cursor-pointer"
+            aria-label="Close menu"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M5 5l10 10M15 5L5 15" />
+            </svg>
+          </button>
+        )}
       </div>
 
       <nav className="px-4 pb-8">
@@ -96,6 +113,7 @@ export default function Sidebar() {
                   <Link
                     key={item.label}
                     href={item.href}
+                    onClick={onNavigate}
                     className="block px-3 py-1.5 text-sm text-text-secondary hover:text-blue-primary hover:bg-blue-pale/30 rounded-md transition-colors font-[family-name:var(--font-dm-sans)]"
                   >
                     {item.label}
