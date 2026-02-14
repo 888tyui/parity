@@ -315,7 +315,7 @@ export default function WorkflowEngine({ path, onReset, onConnectWallet }: Workf
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.25, ease: "easeOut" as const }}
-            className="h-full overflow-auto"
+            className="h-full overflow-auto" data-lenis-prevent
           >
             {renderStep()}
           </motion.div>

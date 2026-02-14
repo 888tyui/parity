@@ -169,7 +169,7 @@ export default function EditorStep({ path, mode, onNext, onAnimating, onComplete
         </div>
 
         {/* Code area */}
-        <div className="flex-1 min-h-0 overflow-auto p-4 bg-bg-primary/50 relative">
+        <div className="flex-1 min-h-0 overflow-auto p-4 bg-bg-primary/50 relative" data-lenis-prevent>
           <div className="font-[family-name:var(--font-cs-caleb-mono)] text-[13px] leading-[1.8]">
             {displayLines.map((line, i) => {
               const isHighlighted =
@@ -246,7 +246,7 @@ export default function EditorStep({ path, mode, onNext, onAnimating, onComplete
 
       {/* Annotation panel for walkthrough mode */}
       {mode === "walkthrough" && annotations.length > 0 && (
-        <div className="w-[320px] shrink-0 border-l border-white/15 glass-deep p-4 overflow-auto flex flex-col">
+        <div className="w-[320px] shrink-0 border-l border-white/15 glass-deep p-4 overflow-auto flex flex-col" data-lenis-prevent>
           <h4 className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary uppercase tracking-wider mb-4">
             Code Walkthrough
           </h4>
@@ -326,7 +326,7 @@ export default function EditorStep({ path, mode, onNext, onAnimating, onComplete
 
       {/* Console for build mode */}
       {mode === "build" && (
-        <div className="glass-deep border-t border-white/20 h-40 overflow-auto shrink-0">
+        <div className="glass-deep border-t border-white/20 h-40 overflow-auto shrink-0" data-lenis-prevent>
           <div className="flex items-center gap-2 px-4 h-7 border-b border-white/15">
             <span className="text-[11px] font-[family-name:var(--font-cs-caleb-mono)] text-text-primary">
               Console

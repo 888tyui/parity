@@ -101,7 +101,7 @@ export default function ResultsStep({ path, analysisResult, showOptimized, isSum
   }
 
   return (
-    <div className="h-full min-h-0 overflow-auto p-6">
+    <div className="h-full min-h-0 overflow-auto p-6" data-lenis-prevent>
       <div className="max-w-2xl mx-auto">
         {/* Header with score */}
         <motion.div
@@ -235,7 +235,7 @@ export default function ResultsStep({ path, analysisResult, showOptimized, isSum
                     FIXED
                   </span>
                 </div>
-                <pre className="p-4 font-[family-name:var(--font-cs-caleb-mono)] text-[12px] leading-[1.7] text-text-secondary overflow-auto max-h-96">
+                <pre className="p-4 font-[family-name:var(--font-cs-caleb-mono)] text-[12px] leading-[1.7] text-text-secondary overflow-auto max-h-96" data-lenis-prevent>
                   {result.optimizedCode}
                 </pre>
               </motion.div>

@@ -2,7 +2,15 @@ const headings = [
   { id: "introduction", label: "Introduction" },
   { id: "installation", label: "Installation" },
   { id: "quickstart", label: "Quick Start" },
-  { id: "concepts", label: "Core Concepts" },
+  { id: "skills", label: "What Are Skills?" },
+  { id: "skillmd", label: "SKILL.md Format" },
+  { id: "context-engine", label: "Context Engine" },
+  { id: "playground", label: "Playground Overview" },
+  { id: "paths", label: "Paths" },
+  { id: "analysis-results", label: "Analysis Results" },
+  { id: "sdk", label: "SDK Overview" },
+  { id: "api", label: "API Reference" },
+  { id: "cicd", label: "CI/CD Integration" },
 ];
 
 export default function TableOfContents() {

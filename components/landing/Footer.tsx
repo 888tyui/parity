@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,6 +10,13 @@ import GradientOrb from "@/components/ui/GradientOrb";
 export default function Footer() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [showGithubToast, setShowGithubToast] = useState(false);
+
+  const handleGithubClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowGithubToast(true);
+    setTimeout(() => setShowGithubToast(false), 3000);
+  };
 
   return (
     <footer ref={ref} className="relative overflow-hidden">
@@ -65,7 +72,7 @@ export default function Footer() {
       {/* Footer links */}
       <div className="border-t border-white/20 glass-warm">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
             {/* Logo */}
             <Link
               href="/"
@@ -91,15 +98,22 @@ export default function Footer() {
               >
                 Docs
               </Link>
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="nav-link text-sm text-text-secondary hover:text-text-primary transition-colors duration-300"
+              <button
+                onClick={handleGithubClick}
+                className="nav-link text-sm text-text-secondary hover:text-text-primary transition-colors duration-300 cursor-pointer"
               >
                 GitHub
-              </a>
+              </button>
             </div>
+
+            {/* GitHub toast */}
+            {showGithubToast && (
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 glass-strong rounded-lg px-5 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.08)] animate-fade-in-up">
+                <p className="text-sm text-text-primary font-[family-name:var(--font-dm-sans)] whitespace-nowrap">
+                  Open source materials will be available soon.
+                </p>
+              </div>
+            )}
 
             {/* Copyright */}
             <p className="text-xs text-text-secondary font-[family-name:var(--font-dm-sans)]">

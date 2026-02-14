@@ -12,31 +12,31 @@ const sections: NavSection[] = [
   {
     title: "Getting Started",
     items: [
-      { label: "Introduction", href: "/docs" },
+      { label: "Introduction", href: "/docs#introduction" },
       { label: "Installation", href: "/docs#installation" },
       { label: "Quick Start", href: "/docs#quickstart" },
     ],
   },
   {
+    title: "Agent Skills",
+    items: [
+      { label: "What Are Skills?", href: "/docs#skills" },
+      { label: "SKILL.md Format", href: "/docs#skillmd" },
+      { label: "Context Engine", href: "/docs#context-engine" },
+    ],
+  },
+  {
     title: "Playground",
     items: [
-      { label: "Editor Overview", href: "/docs#editor" },
-      { label: "Building Contracts", href: "/docs#building" },
-      { label: "Deployment", href: "/docs#deployment" },
+      { label: "Overview", href: "/docs#playground" },
+      { label: "Paths", href: "/docs#paths" },
+      { label: "Analysis Results", href: "/docs#analysis-results" },
     ],
   },
   {
-    title: "AI Agent",
+    title: "SDK & API",
     items: [
-      { label: "Agent Overview", href: "/docs#agent" },
-      { label: "Verification Skills", href: "/docs#skills" },
-      { label: "Analysis Reports", href: "/docs#reports" },
-    ],
-  },
-  {
-    title: "SDK",
-    items: [
-      { label: "TypeScript SDK", href: "/docs#sdk" },
+      { label: "SDK Overview", href: "/docs#sdk" },
       { label: "API Reference", href: "/docs#api" },
       { label: "CI/CD Integration", href: "/docs#cicd" },
     ],
@@ -55,7 +55,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 shrink-0 border-r border-white/20 glass-strong overflow-y-auto">
+    <aside className="w-64 shrink-0 border-r border-white/20 glass-strong overflow-y-auto" data-lenis-prevent>
       <div className="p-6">
         {/* Brand */}
         <Link
