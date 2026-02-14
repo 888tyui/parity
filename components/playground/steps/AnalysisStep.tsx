@@ -2,9 +2,8 @@
 
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { UserPath, AnalysisResult, AgentLogEntry } from "@/types/playground";
+import type { UserPath, AnalysisResult } from "@/types/playground";
 import { playgroundService } from "@/lib/playground/service";
-import { agentLogs as mockAgentLogs } from "@/lib/playground/mock-data";
 
 interface AnalysisStepProps {
   path: UserPath;
@@ -15,7 +14,6 @@ interface AnalysisStepProps {
 
 export default function AnalysisStep({ path, onNext, onAnimating, onAnalysisComplete }: AnalysisStepProps) {
   const [progress, setProgress] = useState(0);
-  const [logs, setLogs] = useState<AgentLogEntry[]>([]);
   const [isComplete, setIsComplete] = useState(false);
   const hasRun = useRef(false);
 
@@ -31,10 +29,6 @@ export default function AnalysisStep({ path, onNext, onAnimating, onAnalysisComp
 
     onAnimatingRef.current(true);
 
-    const allLogs = mockAgentLogs[path];
-    const logInterval = 2000 / allLogs.length;
-    let logIndex = 0;
-
     // Progress counter
     const progressTimer = setInterval(() => {
       setProgress((prev) => {
@@ -46,17 +40,6 @@ export default function AnalysisStep({ path, onNext, onAnimating, onAnalysisComp
       });
     }, 40);
 
-    // Log entries
-    const logTimer = setInterval(() => {
-      if (logIndex < allLogs.length) {
-        const entry = allLogs[logIndex];
-        logIndex++;
-        setLogs((prev) => [...prev, entry]);
-      } else {
-        clearInterval(logTimer);
-      }
-    }, logInterval);
-
     // Analysis complete
     playgroundService.runAnalysis(path).then((result) => {
       setIsComplete(true);
@@ -67,7 +50,6 @@ export default function AnalysisStep({ path, onNext, onAnimating, onAnalysisComp
 
     return () => {
       clearInterval(progressTimer);
-      clearInterval(logTimer);
     };
   }, [path]);
 
@@ -154,47 +136,6 @@ export default function AnalysisStep({ path, onNext, onAnimating, onAnalysisComp
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Agent logs */}
-        <div className="mt-8 text-left glass-card rounded-lg p-4 max-h-48 overflow-auto">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="text-[10px] font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary uppercase tracking-wider">
-              Agent Log
-            </h4>
-            {!isComplete && logs.length > 0 && (
-              <span className="flex items-center gap-1 text-[10px] font-[family-name:var(--font-cs-caleb-mono)] text-blue-primary">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-primary animate-pulse" />
-                Live
-              </span>
-            )}
-            {isComplete && (
-              <span className="flex items-center gap-1 text-[10px] font-[family-name:var(--font-cs-caleb-mono)] text-green-800">
-                <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 6l3 3 5-5" /></svg>
-                Done
-              </span>
-            )}
-          </div>
-          <div className="space-y-1.5 font-[family-name:var(--font-cs-caleb-mono)] text-[11px]">
-            {logs.map((log, i) => (
-              <motion.p
-                key={i}
-                initial={{ opacity: 0, x: -5 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.2 }}
-                className={
-                  log.type === "warning"
-                    ? "text-accent-warm"
-                    : log.type === "success"
-                      ? "text-green-800"
-                      : "text-text-secondary"
-                }
-              >
-                <span className="text-blue-primary">{log.timestamp}</span>{" "}
-                {log.message}
-              </motion.p>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   );
