@@ -56,7 +56,7 @@ export default function Navbar() {
                 </svg>
               </a>
               <a
-                href="https://x.com"
+                href="https://x.com/paritydotcx"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-text-secondary hover:text-text-primary transition-colors duration-300 p-1"
