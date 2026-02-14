@@ -54,7 +54,6 @@ export const metadata: Metadata = {
     title: "PARITY — Solana Contract Playground & AI Verification",
     description:
       "A smart contract framework with composable skills and APIs that enable AI agents to perform audit-level code review.",
-    images: [{ url: "/logo.png", width: 1000, height: 1000 }],
   },
 };
 
