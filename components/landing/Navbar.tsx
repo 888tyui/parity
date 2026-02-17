@@ -53,7 +53,7 @@ export default function Navbar() {
 
             <div className="flex items-center gap-2">
               <a
-                href="https://github.com/parity-solana"
+                href="https://github.com/paritydotcx/paritycx"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-text-secondary hover:text-text-primary transition-colors duration-300 p-1"

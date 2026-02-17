@@ -104,7 +104,7 @@ export default function Footer() {
                 Docs
               </Link>
               <a
-                href="https://github.com/parity-solana"
+                href="https://github.com/paritydotcx/paritycx"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="nav-link text-sm text-text-secondary hover:text-text-primary transition-colors duration-300"
