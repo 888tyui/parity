@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+const prtCa = process.env.NEXT_PUBLIC_PRT_CA || "";
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [showPrtToast, setShowPrtToast] = useState(false);
@@ -15,6 +17,7 @@ export default function Navbar() {
   }, []);
 
   const handlePrtClick = () => {
+    if (prtCa) return; // will navigate via <a> tag
     setShowPrtToast(true);
     setTimeout(() => setShowPrtToast(false), 3000);
   };
@@ -94,12 +97,23 @@ export default function Navbar() {
             >
               Docs
             </Link>
-            <button
-              onClick={handlePrtClick}
-              className="nav-link text-sm text-blue-primary hover:text-blue-deep transition-colors duration-300 font-[family-name:var(--font-cs-caleb-mono)] cursor-pointer"
-            >
-              $PRT
-            </button>
+            {prtCa ? (
+              <a
+                href={`https://pump.fun/coin/${prtCa}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="nav-link text-sm text-blue-primary hover:text-blue-deep transition-colors duration-300 font-[family-name:var(--font-cs-caleb-mono)] cursor-pointer"
+              >
+                $PRT
+              </a>
+            ) : (
+              <button
+                onClick={handlePrtClick}
+                className="nav-link text-sm text-blue-primary hover:text-blue-deep transition-colors duration-300 font-[family-name:var(--font-cs-caleb-mono)] cursor-pointer"
+              >
+                $PRT
+              </button>
+            )}
           </div>
         </div>
       </div>
