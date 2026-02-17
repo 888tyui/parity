@@ -10,14 +10,7 @@ import GradientOrb from "@/components/ui/GradientOrb";
 export default function Footer() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const [showGithubToast, setShowGithubToast] = useState(false);
   const [showPrtToast, setShowPrtToast] = useState(false);
-
-  const handleGithubClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setShowGithubToast(true);
-    setTimeout(() => setShowGithubToast(false), 3000);
-  };
 
   const handlePrtClick = () => {
     setShowPrtToast(true);
@@ -99,17 +92,25 @@ export default function Footer() {
                 Playground
               </Link>
               <Link
+                href="/skills"
+                className="nav-link text-sm text-text-secondary hover:text-text-primary transition-colors duration-300"
+              >
+                Skills
+              </Link>
+              <Link
                 href="/docs"
                 className="nav-link text-sm text-text-secondary hover:text-text-primary transition-colors duration-300"
               >
                 Docs
               </Link>
-              <button
-                onClick={handleGithubClick}
-                className="nav-link text-sm text-text-secondary hover:text-text-primary transition-colors duration-300 cursor-pointer"
+              <a
+                href="https://github.com/parity-solana"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="nav-link text-sm text-text-secondary hover:text-text-primary transition-colors duration-300"
               >
                 GitHub
-              </button>
+              </a>
               <button
                 onClick={handlePrtClick}
                 className="nav-link text-sm text-blue-primary hover:text-blue-deep transition-colors duration-300 font-[family-name:var(--font-cs-caleb-mono)] cursor-pointer"
@@ -118,14 +119,7 @@ export default function Footer() {
               </button>
             </div>
 
-            {/* GitHub toast */}
-            {showGithubToast && (
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 glass-strong rounded-lg px-5 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.08)] animate-fade-in-up">
-                <p className="text-sm text-text-primary font-[family-name:var(--font-dm-sans)] whitespace-nowrap">
-                  Open source materials will be available soon.
-                </p>
-              </div>
-            )}
+
             {/* $PRT toast */}
             {showPrtToast && (
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 glass-strong rounded-lg px-5 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.08)] animate-fade-in-up">
