@@ -18,8 +18,8 @@ const MAX_TOKENS = 500_000; // ~500K token safety cap ($1.50 input max)
 const SOURCE_EXTENSIONS = new Set([
     // Systems / blockchain
     ".rs", ".sol", ".move", ".go", ".c", ".cpp", ".h",
-    // Web / app
-    ".ts", ".tsx", ".js", ".jsx", ".css", ".scss", ".html",
+    // Web / app (logic only — no CSS/HTML)
+    ".ts", ".tsx", ".js", ".jsx",
     // Scripting
     ".py", ".rb", ".php", ".sh",
     // Data / config
