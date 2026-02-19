@@ -121,7 +121,7 @@ export async function cloneAndExtract(repoUrl: string): Promise<CloneResult> {
 
                     // Early exit if over limit
                     if (totalLines > MAX_LINES) {
-                        throw new Error("TOO_LARGE");
+                        throw new Error(`TOO_LARGE:${totalLines}`);
                     }
                 }
             }

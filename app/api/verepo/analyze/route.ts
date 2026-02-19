@@ -120,13 +120,14 @@ export async function POST(req: NextRequest) {
         try {
             cloneResult = await cloneAndExtract(repoUrl);
         } catch (err: unknown) {
-            if (err instanceof Error && err.message === "TOO_LARGE") {
+            if (err instanceof Error && err.message.startsWith("TOO_LARGE")) {
+                const actualLines = parseInt(err.message.split(":")[1]) || 0;
                 await prisma.verepoResult.update({
                     where: { repoKey },
-                    data: { status: "error", error: "TOO_LARGE" },
+                    data: { status: "error", error: "TOO_LARGE", totalLines: actualLines },
                 });
                 return errorResponse(
-                    "Repository exceeds the 10,000 line limit. Verepo analyzes repositories up to 10,000 lines of source code.",
+                    `Repository has ${actualLines.toLocaleString()}+ lines of source code, exceeding the 10,000 line limit. Try a smaller repository.`,
                     "TOO_LARGE",
                     413
                 );
