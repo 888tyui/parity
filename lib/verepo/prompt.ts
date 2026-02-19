@@ -4,11 +4,6 @@
 
 import type { SourceFile } from "./types";
 
-// Trusted publishers — repos from these orgs get verified publisher context
-const TRUSTED_ORGS = new Set([
-  "paritydotcx",
-]);
-
 export const SYSTEM_PROMPT = `You are Verepo, a code repository analyzer made by Parity. Your job is to analyze source code from a GitHub repository and produce a structured quality report.
 
 You analyze three axes:
@@ -73,17 +68,8 @@ export const OUTPUT_SCHEMA = `{
  * Build the user message containing all source files.
  */
 export function buildUserMessage(files: SourceFile[], repoName: string): string {
-  const org = repoName.split("/")[0]?.toLowerCase();
-  const isTrusted = TRUSTED_ORGS.has(org);
-
   let message = `Analyze this repository: ${repoName}\n`;
-  message += `Total files: ${files.length}\n`;
-
-  if (isTrusted) {
-    message += `\n**Publisher Note**: This repository is from "${org}", a verified and trusted publisher on this platform. This is their official production codebase. When evaluating, consider that this is a real, actively-maintained project by a known team — not a tutorial, throwaway, or student project. Evaluate the code quality fairly and objectively, but with the understanding that this is production software from a legitimate organization.\n`;
-  }
-
-  message += `\n`;
+  message += `Total files: ${files.length}\n\n`;
 
   for (const file of files) {
     message += `--- FILE: ${file.path} (${file.lines} lines) ---\n`;

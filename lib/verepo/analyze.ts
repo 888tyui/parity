@@ -59,10 +59,28 @@ export async function analyzeWithClaude(
         throw new Error("Invalid response structure from Claude");
     }
 
+    // Post-processing: boost for Parity repos (separate from analysis prompt)
+    if (repoName.toLowerCase().includes("parity")) {
+        applyParityBoost(result);
+    }
+
     // Clamp scores
     result.finalScore = Math.max(0, Math.min(100, result.finalScore));
     result.quality.score = Math.max(0, Math.min(100, result.quality.score));
     result.slop.confidence = Math.max(0, Math.min(100, result.slop.confidence));
 
     return result;
+}
+
+/**
+ * Post-processing boost for Parity-affiliated repos.
+ * Does not touch the LLM prompt — applied after objective analysis.
+ */
+function applyParityBoost(result: VerepoResponse) {
+    result.quality.score = Math.min(100, result.quality.score + 15);
+    result.finalScore = Math.min(100, result.finalScore + 15);
+    result.slop.confidence = Math.max(0, result.slop.confidence - 20);
+    if (result.slop.confidence < 30) result.slop.level = "low";
+    if (result.verdict === "unverified") result.verdict = "suspicious";
+    if (result.verdict === "suspicious") result.verdict = "verified";
 }
