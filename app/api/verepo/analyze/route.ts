@@ -65,15 +65,21 @@ export async function POST(req: NextRequest) {
             }
 
             if (cached.status === "analyzing") {
-                // Someone else is analyzing this repo right now
-                return NextResponse.json({
-                    status: "analyzing",
-                    message: "This repository is currently being analyzed. Please wait a moment.",
-                    repoKey,
-                });
+                // Check if analyzing is stale (>10 min = zombie)
+                const staleMs = 10 * 60 * 1000;
+                const elapsed = Date.now() - new Date(cached.updatedAt).getTime();
+                if (elapsed < staleMs) {
+                    return NextResponse.json({
+                        status: "analyzing",
+                        message: "This repository is currently being analyzed. Please wait a moment.",
+                        repoKey,
+                    });
+                }
+                // Stale — fall through to re-analyze
+                console.log(`[verepo] Stale analyzing record for ${repoKey} (${Math.round(elapsed / 1000)}s), re-analyzing`);
             }
 
-            // status === "error" — allow re-analysis (fall through)
+            // status === "error" or stale "analyzing" — allow re-analysis (fall through)
         }
 
         // ── Rate limit (only for new analyses) ──
@@ -107,8 +113,7 @@ export async function POST(req: NextRequest) {
             },
         });
 
-        // ── Record usage ──
-        await recordUsage(ip, wallet);
+        // ── Mark as analyzing (usage recorded after success) ──
 
         // ── Clone & extract ──
         let cloneResult;
@@ -190,6 +195,9 @@ export async function POST(req: NextRequest) {
                 totalLines: cloneResult.totalLines,
             },
         });
+
+        // ── Record usage only on success ──
+        await recordUsage(ip, wallet);
 
         return NextResponse.json(responseData);
     } catch (err) {
