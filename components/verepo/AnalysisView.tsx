@@ -85,21 +85,47 @@ export default function AnalysisView({ result, onReset }: AnalysisViewProps) {
                     className="glass-card rounded-2xl p-10 depth-card"
                 >
                     <div className="flex flex-col lg:flex-row lg:items-center gap-8">
-                        {/* Left: Score + Verdict */}
-                        <div className="text-center lg:text-left lg:shrink-0">
-                            <p className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary uppercase tracking-wider">
-                                Final Score
-                            </p>
-                            <p className="mt-2 font-[family-name:var(--font-cs-caleb-mono)] text-7xl text-blue-primary">
-                                {finalScore}
-                            </p>
-                            <p className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary/60 mt-1">
-                                / 100
-                            </p>
-                            <div className="mt-4">
+                        {/* Left: Circular Score + Verdict */}
+                        <div className="flex flex-col items-center lg:shrink-0">
+                            {/* Circular Gauge */}
+                            <div className="relative w-40 h-40">
+                                <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
+                                    {/* Background ring */}
+                                    <circle
+                                        cx="60" cy="60" r="52"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        className="text-border/30"
+                                        strokeWidth="8"
+                                    />
+                                    {/* Score ring */}
+                                    <motion.circle
+                                        cx="60" cy="60" r="52"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        className={finalScore >= 80 ? "text-green-500" : finalScore >= 60 ? "text-yellow-500" : "text-red-400"}
+                                        strokeWidth="8"
+                                        strokeLinecap="round"
+                                        strokeDasharray={`${2 * Math.PI * 52}`}
+                                        initial={{ strokeDashoffset: 2 * Math.PI * 52 }}
+                                        animate={{ strokeDashoffset: 2 * Math.PI * 52 * (1 - finalScore / 100) }}
+                                        transition={{ duration: 1.2, ease: "easeOut", delay: 0.2 }}
+                                    />
+                                </svg>
+                                {/* Center text */}
+                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                    <span className="font-[family-name:var(--font-cs-caleb-mono)] text-4xl text-text-primary">
+                                        {finalScore}
+                                    </span>
+                                    <span className="text-[10px] font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary/50">
+                                        / 100
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="mt-3">
                                 <VerdictBadge verdict={verdict} />
                             </div>
-                            <div className="mt-2 flex items-center justify-center lg:justify-start gap-3">
+                            <div className="mt-2 flex items-center justify-center gap-3">
                                 <span className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary">
                                     {meta.repoName}
                                 </span>
