@@ -78,52 +78,67 @@ export default function AnalysisView({ result, onReset }: AnalysisViewProps) {
     return (
         <div className="flex-1 overflow-auto" data-lenis-prevent>
             <div className="max-w-4xl mx-auto px-6 py-8 space-y-6">
-                {/* ── Hero: Score + Verdict ── */}
+                {/* ── 1. Hero: Score + Quality Breakdown ── */}
                 <motion.div
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="glass-card rounded-2xl p-10 depth-card text-center"
+                    className="glass-card rounded-2xl p-10 depth-card"
                 >
-                    <p className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary uppercase tracking-wider">
-                        Final Score
-                    </p>
-                    <p className="mt-2 font-[family-name:var(--font-cs-caleb-mono)] text-7xl text-blue-primary">
-                        {finalScore}
-                    </p>
-                    <p className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary/60 mt-1">
-                        / 100
-                    </p>
-                    <div className="mt-4">
-                        <VerdictBadge verdict={verdict} />
-                    </div>
-                    <div className="mt-2 flex items-center justify-center gap-3">
-                        <span className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary">
-                            {meta.repoName}
-                        </span>
-                        <div className="w-px h-3 bg-border" />
-                        <span className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary">
-                            {meta.filesAnalyzed} files · {meta.totalLines.toLocaleString()} lines
-                        </span>
+                    <div className="flex flex-col lg:flex-row lg:items-center gap-8">
+                        {/* Left: Score + Verdict */}
+                        <div className="text-center lg:text-left lg:shrink-0">
+                            <p className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary uppercase tracking-wider">
+                                Final Score
+                            </p>
+                            <p className="mt-2 font-[family-name:var(--font-cs-caleb-mono)] text-7xl text-blue-primary">
+                                {finalScore}
+                            </p>
+                            <p className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary/60 mt-1">
+                                / 100
+                            </p>
+                            <div className="mt-4">
+                                <VerdictBadge verdict={verdict} />
+                            </div>
+                            <div className="mt-2 flex items-center justify-center lg:justify-start gap-3">
+                                <span className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary">
+                                    {meta.repoName}
+                                </span>
+                                <div className="w-px h-3 bg-border" />
+                                <span className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary">
+                                    {meta.filesAnalyzed} files · {meta.totalLines.toLocaleString()} lines
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Right: Quality Breakdown */}
+                        <div className="flex-1 lg:border-l lg:border-border lg:pl-8">
+                            <div className="flex items-center justify-between mb-3">
+                                <h4 className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary uppercase tracking-wider">
+                                    Code Quality
+                                </h4>
+                                <span className="font-[family-name:var(--font-cs-caleb-mono)] text-lg text-text-primary">
+                                    {quality.score}
+                                </span>
+                            </div>
+                            <div className="space-y-2.5">
+                                {Object.entries(quality.breakdown).map(([key, val], i) => (
+                                    <ScoreBar
+                                        key={key}
+                                        label={key.replace(/([A-Z])/g, " $1").trim()}
+                                        value={val}
+                                        delay={0.1 + i * 0.05}
+                                    />
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </motion.div>
 
-                {/* ── Summary ── */}
+                {/* ── 2. Category: What Is This? ── */}
                 <motion.div
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="glass-blue rounded-xl p-6"
-                >
-                    <p className="text-sm font-[family-name:var(--font-dm-sans)] text-text-secondary leading-relaxed">
-                        {summary}
-                    </p>
-                </motion.div>
-
-                {/* ── Category (full-width) ── */}
-                <motion.div
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15 }}
                     className="glass-card rounded-xl p-5 depth-card"
                 >
                     <h4 className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary uppercase tracking-wider mb-3">
@@ -153,84 +168,69 @@ export default function AnalysisView({ result, onReset }: AnalysisViewProps) {
                     )}
                 </motion.div>
 
-                {/* ── Quality + Slop (2-column) ── */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    {/* Quality Card */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="glass-card rounded-xl p-5 depth-card"
-                    >
-                        <div className="flex items-center justify-between mb-3">
-                            <h4 className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary uppercase tracking-wider">
-                                Code Quality
-                            </h4>
-                            <span className="font-[family-name:var(--font-cs-caleb-mono)] text-lg text-text-primary">
-                                {quality.score}
-                            </span>
+                {/* ── 3. Slop Detection ── */}
+                <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 }}
+                    className="glass-card rounded-xl p-5 depth-card"
+                >
+                    <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary uppercase tracking-wider">
+                            Slop Detection
+                        </h4>
+                        <SlopBadge level={slop.level} />
+                    </div>
+                    <div className="flex items-center gap-2 mb-4">
+                        <span className="text-sm font-[family-name:var(--font-dm-sans)] text-text-secondary">
+                            Confidence
+                        </span>
+                        <div className="flex-1 h-2 rounded-full bg-border/50 overflow-hidden">
+                            <motion.div
+                                className="h-full rounded-full bg-blue-primary"
+                                initial={{ width: 0 }}
+                                animate={{ width: `${slop.confidence}%` }}
+                                transition={{ duration: 0.8, delay: 0.2 }}
+                            />
                         </div>
-                        <div className="space-y-2.5">
-                            {Object.entries(quality.breakdown).map(([key, val], i) => (
-                                <ScoreBar
-                                    key={key}
-                                    label={key.replace(/([A-Z])/g, " $1").trim()}
-                                    value={val}
-                                    delay={0.1 + i * 0.05}
-                                />
-                            ))}
-                        </div>
-                    </motion.div>
-
-                    {/* Slop Card */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.25 }}
-                        className="glass-card rounded-xl p-5 depth-card"
-                    >
-                        <div className="flex items-center justify-between mb-3">
-                            <h4 className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary uppercase tracking-wider">
-                                Slop Detection
-                            </h4>
-                            <SlopBadge level={slop.level} />
-                        </div>
-                        <div className="flex items-center gap-2 mb-4">
-                            <span className="text-sm font-[family-name:var(--font-dm-sans)] text-text-secondary">
-                                Confidence
-                            </span>
-                            <div className="flex-1 h-2 rounded-full bg-border/50 overflow-hidden">
-                                <motion.div
-                                    className="h-full rounded-full bg-blue-primary"
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${slop.confidence}%` }}
-                                    transition={{ duration: 0.8, delay: 0.3 }}
-                                />
+                        <span className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary">
+                            {slop.confidence}%
+                        </span>
+                    </div>
+                    <div className="space-y-2">
+                        {slop.signals.map((signal, i) => (
+                            <div key={i} className="flex items-start gap-2">
+                                <span className="text-xs text-text-secondary/50 mt-0.5 shrink-0">●</span>
+                                <p className="text-sm font-[family-name:var(--font-dm-sans)] text-text-secondary leading-relaxed">
+                                    {signal}
+                                </p>
                             </div>
-                            <span className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary">
-                                {slop.confidence}%
-                            </span>
-                        </div>
-                        <div className="space-y-2">
-                            {slop.signals.map((signal, i) => (
-                                <div key={i} className="flex items-start gap-2">
-                                    <span className="text-xs text-text-secondary/50 mt-0.5 shrink-0">●</span>
-                                    <p className="text-sm font-[family-name:var(--font-dm-sans)] text-text-secondary leading-relaxed">
-                                        {signal}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    </motion.div>
-                </div>
+                        ))}
+                    </div>
+                </motion.div>
 
-                {/* ── Highlights & Concerns ── */}
+                {/* ── 4. Summary ── */}
+                <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="glass-blue rounded-xl p-6"
+                >
+                    <h4 className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary uppercase tracking-wider mb-3">
+                        Analysis Summary
+                    </h4>
+                    <p className="text-sm font-[family-name:var(--font-dm-sans)] text-text-secondary leading-relaxed">
+                        {summary}
+                    </p>
+                </motion.div>
+
+                {/* ── 5. Highlights & Concerns ── */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {/* Highlights */}
                     <motion.div
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
+                        transition={{ delay: 0.25 }}
                         className="glass-card rounded-xl p-5 depth-card"
                     >
                         <h4 className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-green-700 uppercase tracking-wider mb-3 flex items-center gap-1.5">
@@ -250,7 +250,7 @@ export default function AnalysisView({ result, onReset }: AnalysisViewProps) {
                     <motion.div
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.35 }}
+                        transition={{ delay: 0.3 }}
                         className="glass-card rounded-xl p-5 depth-card"
                     >
                         <h4 className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-yellow-700 uppercase tracking-wider mb-3 flex items-center gap-1.5">
@@ -271,7 +271,7 @@ export default function AnalysisView({ result, onReset }: AnalysisViewProps) {
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
+                    transition={{ delay: 0.35 }}
                     className="flex items-center justify-center pb-4"
                 >
                     <button
