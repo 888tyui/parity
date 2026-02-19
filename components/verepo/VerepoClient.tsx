@@ -8,6 +8,10 @@ import SubNav from "@/components/ui/SubNav";
 import RepoInput from "./RepoInput";
 import AnalysisView from "./AnalysisView";
 import type { VerepoResponse, VerepoError } from "@/lib/verepo/types";
+import bs58 from "bs58";
+
+const SIGN_MESSAGE_PREFIX = "Parity Verepo: verify wallet ownership\n\nTimestamp: ";
+const SIGNATURE_TTL = 5 * 60 * 1000; // 5 minutes
 
 type Phase = "input" | "loading" | "polling" | "result" | "error";
 
@@ -25,6 +29,11 @@ interface UsageInfo {
     resetIn: number;
 }
 
+interface WalletSignature {
+    signature: string;
+    timestamp: number;
+}
+
 export default function VerepoClient() {
     const [phase, setPhase] = useState<Phase>("input");
     const [state, setState] = useState<AnalysisState>({
@@ -37,9 +46,11 @@ export default function VerepoClient() {
     const [usage, setUsage] = useState<UsageInfo | null>(null);
     const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-    const { publicKey, connected } = useWallet();
+    const { publicKey, connected, signMessage } = useWallet();
     const { setVisible } = useWalletModal();
     const walletAddress = publicKey?.toBase58();
+    const [walletSig, setWalletSig] = useState<WalletSignature | null>(null);
+    const [sigPending, setSigPending] = useState(false);
 
     // Fetch usage info when wallet connects
     const fetchUsage = useCallback(async () => {
@@ -60,6 +71,30 @@ export default function VerepoClient() {
     useEffect(() => {
         fetchUsage();
     }, [fetchUsage]);
+
+    // Sign message when wallet connects
+    useEffect(() => {
+        if (!connected || !signMessage || !walletAddress || sigPending) return;
+        // Already have a valid signature
+        if (walletSig && (Date.now() - walletSig.timestamp) < SIGNATURE_TTL) return;
+
+        const doSign = async () => {
+            setSigPending(true);
+            try {
+                const timestamp = Date.now();
+                const message = new TextEncoder().encode(`${SIGN_MESSAGE_PREFIX}${timestamp}`);
+                const sig = await signMessage(message);
+                setWalletSig({ signature: bs58.encode(sig), timestamp });
+            } catch (err) {
+                console.error("Wallet signature rejected:", err);
+                // User rejected — disconnect? Just clear sig
+                setWalletSig(null);
+            } finally {
+                setSigPending(false);
+            }
+        };
+        doSign();
+    }, [connected, signMessage, walletAddress, walletSig, sigPending]);
 
     // Cleanup polling on unmount
     useEffect(() => {
@@ -93,9 +128,25 @@ export default function VerepoClient() {
     }, [fetchUsage]);
 
     const handleSubmit = async (url: string) => {
-        if (!walletAddress) {
+        if (!walletAddress || !walletSig) {
             setVisible(true);
             return;
+        }
+
+        // Re-sign if signature expired
+        let sig = walletSig;
+        if ((Date.now() - sig.timestamp) >= SIGNATURE_TTL && signMessage) {
+            try {
+                const timestamp = Date.now();
+                const message = new TextEncoder().encode(`${SIGN_MESSAGE_PREFIX}${timestamp}`);
+                const rawSig = await signMessage(message);
+                sig = { signature: bs58.encode(rawSig), timestamp };
+                setWalletSig(sig);
+            } catch {
+                setState((s) => ({ ...s, error: "Wallet signature required to analyze." }));
+                setPhase("error");
+                return;
+            }
         }
 
         setState({ repoUrl: url, repoKey: "", result: null, error: null, cached: false });
@@ -108,6 +159,8 @@ export default function VerepoClient() {
                 body: JSON.stringify({
                     repoUrl: url,
                     wallet: walletAddress,
+                    signature: sig.signature,
+                    timestamp: sig.timestamp,
                 }),
             });
 

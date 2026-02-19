@@ -8,6 +8,7 @@ import {
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import type { WalletError, Adapter } from "@solana/wallet-adapter-base";
+import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
 import { clusterApiUrl } from "@solana/web3.js";
 
 import "@solana/wallet-adapter-react-ui/styles.css";
@@ -20,9 +21,8 @@ export default function SolanaWalletProvider({
   const network = WalletAdapterNetwork.Devnet;
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 
-  // Empty array — Wallet Standard auto-detects Phantom, Solflare, etc.
-  // No Ledger/USB adapters per project rules.
-  const wallets = useMemo(() => [], []);
+  // Phantom explicitly added for reliable popup; Wallet Standard still auto-detects others
+  const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
 
   const onError = useCallback((error: WalletError, adapter?: Adapter) => {
     console.error("Wallet error:", error.name, error.message, adapter?.name);

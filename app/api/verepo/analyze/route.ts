@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateRepoUrl, cloneAndExtract, extractRepoName } from "@/lib/verepo/clone";
 import { analyzeWithClaude } from "@/lib/verepo/analyze";
 import { checkRateLimit, recordUsage } from "@/lib/verepo/rate-limit";
+import { verifyWalletSignature } from "@/lib/verepo/verify-wallet";
 import { prisma } from "@/lib/prisma";
 import type { VerepoError } from "@/lib/verepo/types";
 
@@ -29,6 +30,16 @@ export async function POST(req: NextRequest) {
         // ── Wallet required ──
         if (!wallet) {
             return errorResponse("Wallet connection required to analyze repositories.", "RATE_LIMITED", 401);
+        }
+
+        // ── Verify wallet signature ──
+        const signature: string | undefined = body.signature;
+        const timestamp: number | undefined = body.timestamp;
+        if (!signature || !timestamp) {
+            return errorResponse("Wallet signature required.", "RATE_LIMITED", 401);
+        }
+        if (!verifyWalletSignature(wallet, signature, timestamp)) {
+            return errorResponse("Invalid wallet signature.", "RATE_LIMITED", 401);
         }
 
         // ── Validate URL ──
