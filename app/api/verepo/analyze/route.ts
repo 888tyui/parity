@@ -174,7 +174,7 @@ export async function POST(req: NextRequest) {
             where: { repoKey },
             data: {
                 status: "done",
-                result: responseData,
+                result: JSON.parse(JSON.stringify(responseData)),
                 filesCount: cloneResult.files.length,
                 totalLines: cloneResult.totalLines,
             },
