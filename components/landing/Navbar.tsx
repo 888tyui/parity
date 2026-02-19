@@ -86,6 +86,12 @@ export default function Navbar() {
               Playground
             </Link>
             <Link
+              href="/verepo"
+              className="nav-link text-sm text-text-secondary hover:text-text-primary transition-colors duration-300 font-[family-name:var(--font-dm-sans)]"
+            >
+              Verepo
+            </Link>
+            <Link
               href="/skills"
               className="nav-link text-sm text-text-secondary hover:text-text-primary transition-colors duration-300 font-[family-name:var(--font-dm-sans)]"
             >

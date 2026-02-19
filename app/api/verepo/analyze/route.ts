@@ -1,0 +1,188 @@
+// ========================================
+// Verepo — API Route: POST /api/verepo/analyze
+// ========================================
+
+import { NextRequest, NextResponse } from "next/server";
+import { validateRepoUrl, cloneAndExtract, extractRepoName } from "@/lib/verepo/clone";
+import { analyzeWithClaude } from "@/lib/verepo/analyze";
+import { checkRateLimit, recordUsage } from "@/lib/verepo/rate-limit";
+import { prisma } from "@/lib/prisma";
+import type { VerepoError } from "@/lib/verepo/types";
+
+export const maxDuration = 120; // Allow up to 2 minutes for clone + analysis
+
+function errorResponse(error: string, code: VerepoError["code"], status: number) {
+    return NextResponse.json({ error, code } satisfies VerepoError, { status });
+}
+
+export async function POST(req: NextRequest) {
+    try {
+        // ── Parse body ──
+        const body = await req.json().catch(() => null);
+        if (!body || typeof body.repoUrl !== "string") {
+            return errorResponse("Missing repoUrl in request body", "INVALID_URL", 400);
+        }
+
+        const repoUrl = body.repoUrl.trim();
+        const wallet: string | undefined = typeof body.wallet === "string" && body.wallet.length > 0 ? body.wallet : undefined;
+
+        // ── Wallet required ──
+        if (!wallet) {
+            return errorResponse("Wallet connection required to analyze repositories.", "RATE_LIMITED", 401);
+        }
+
+        // ── Validate URL ──
+        if (!validateRepoUrl(repoUrl)) {
+            return errorResponse(
+                "Invalid GitHub URL. Use format: https://github.com/owner/repo",
+                "INVALID_URL",
+                400
+            );
+        }
+
+        // ── Check cache ──
+        const repoKey = extractRepoName(repoUrl);
+        const cached = await prisma.verepoResult.findUnique({ where: { repoKey } });
+
+        if (cached) {
+            if (cached.status === "done" && cached.result) {
+                // Return cached result — no rate limit charge
+                return NextResponse.json({
+                    ...(cached.result as Record<string, unknown>),
+                    cached: true,
+                });
+            }
+
+            if (cached.status === "analyzing") {
+                // Someone else is analyzing this repo right now
+                return NextResponse.json({
+                    status: "analyzing",
+                    message: "This repository is currently being analyzed. Please wait a moment.",
+                    repoKey,
+                });
+            }
+
+            // status === "error" — allow re-analysis (fall through)
+        }
+
+        // ── Rate limit (only for new analyses) ──
+        const ip =
+            req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+            req.headers.get("x-real-ip") ||
+            "unknown";
+
+        const rateCheck = await checkRateLimit(ip, wallet);
+        if (!rateCheck.allowed) {
+            const resetMinutes = Math.ceil(rateCheck.resetIn / 60000);
+            return errorResponse(
+                rateCheck.reason || `Rate limit exceeded. Resets in ${resetMinutes} minute${resetMinutes === 1 ? "" : "s"} (KST 9:00 AM).`,
+                "RATE_LIMITED",
+                429
+            );
+        }
+
+        // ── Mark as analyzing ──
+        const repoKeyParts = repoKey.split("/");
+        await prisma.verepoResult.upsert({
+            where: { repoKey },
+            update: { status: "analyzing", error: null, analyzedBy: wallet || `ip:${ip}`, updatedAt: new Date() },
+            create: {
+                repoUrl,
+                repoOwner: repoKeyParts[0],
+                repoName: repoKeyParts[1],
+                repoKey,
+                status: "analyzing",
+                analyzedBy: wallet || `ip:${ip}`,
+            },
+        });
+
+        // ── Record usage ──
+        await recordUsage(ip, wallet);
+
+        // ── Clone & extract ──
+        let cloneResult;
+        try {
+            cloneResult = await cloneAndExtract(repoUrl);
+        } catch (err: unknown) {
+            if (err instanceof Error && err.message === "TOO_LARGE") {
+                await prisma.verepoResult.update({
+                    where: { repoKey },
+                    data: { status: "error", error: "TOO_LARGE" },
+                });
+                return errorResponse(
+                    "Repository exceeds the 10,000 line limit. Verepo analyzes repositories up to 10,000 lines of source code.",
+                    "TOO_LARGE",
+                    413
+                );
+            }
+            console.error("[verepo] Clone failed:", err);
+            await prisma.verepoResult.update({
+                where: { repoKey },
+                data: { status: "error", error: "CLONE_FAILED" },
+            });
+            return errorResponse(
+                "Failed to clone repository. Make sure the repo exists and is public.",
+                "CLONE_FAILED",
+                422
+            );
+        }
+
+        // ── Check for source files ──
+        if (cloneResult.files.length === 0) {
+            await prisma.verepoResult.update({
+                where: { repoKey },
+                data: { status: "error", error: "NO_SOURCE" },
+            });
+            return errorResponse(
+                "No source files found in this repository.",
+                "NO_SOURCE",
+                422
+            );
+        }
+
+        // ── Analyze with Claude ──
+        let result;
+        try {
+            result = await analyzeWithClaude(cloneResult.files, cloneResult.repoName);
+        } catch (err) {
+            console.error("[verepo] Analysis failed:", err);
+            await prisma.verepoResult.update({
+                where: { repoKey },
+                data: { status: "error", error: "ANALYSIS_FAILED" },
+            });
+            return errorResponse(
+                "Analysis failed. Please try again later.",
+                "ANALYSIS_FAILED",
+                500
+            );
+        }
+
+        // ── Build response ──
+        const responseData = {
+            ...result,
+            meta: {
+                repoName: cloneResult.repoName,
+                filesAnalyzed: cloneResult.files.length,
+                totalLines: cloneResult.totalLines,
+                analyzedAt: new Date().toISOString(),
+                remaining: rateCheck.remaining - 1,
+            },
+        };
+
+        // ── Save to cache ──
+        await prisma.verepoResult.update({
+            where: { repoKey },
+            data: {
+                status: "done",
+                result: responseData,
+                filesCount: cloneResult.files.length,
+                totalLines: cloneResult.totalLines,
+            },
+        });
+
+        return NextResponse.json(responseData);
+    } catch (err) {
+        console.error("[verepo] Unexpected error:", err);
+        return errorResponse("Internal server error", "ANALYSIS_FAILED", 500);
+    }
+}

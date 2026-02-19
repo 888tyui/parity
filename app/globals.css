@@ -438,6 +438,35 @@ html.lenis, html.lenis body {
 }
 
 /* ========================================
+   Verepo Animations
+   ======================================== */
+
+/* Scan line sweep */
+@keyframes scan-line {
+  0% { transform: translateY(-100%); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+
+.scan-line {
+  animation: scan-line 2.5s ease-in-out infinite;
+}
+
+/* Verdict badge glow */
+.verdict-verified {
+  box-shadow: 0 0 12px rgba(34, 139, 34, 0.15);
+}
+
+.verdict-suspicious {
+  box-shadow: 0 0 12px rgba(200, 150, 0, 0.15);
+}
+
+.verdict-unverified {
+  box-shadow: 0 0 12px rgba(200, 50, 50, 0.15);
+}
+
+/* ========================================
    Solana Wallet Adapter Modal Overrides
    ======================================== */
 

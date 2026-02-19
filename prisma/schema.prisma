@@ -46,7 +46,7 @@ model AgentAnalysis {
   id         String   @id @default(cuid())
   score      Int
   status     String   @default("completed")
-  findings   Json
+  findings   Json     // Native JSON for PostgreSQL
   agentLog   String?
   createdAt  DateTime @default(now())
 
@@ -60,4 +60,34 @@ model Waitlist {
   email     String
   path      String?
   createdAt DateTime @default(now())
+}
+
+// ── Verepo: Result Cache ──
+model VerepoResult {
+  id         String   @id @default(cuid())
+  repoUrl    String              // Original URL
+  repoOwner  String              // e.g. "solana-labs"
+  repoName   String              // e.g. "example-helloworld"
+  repoKey    String   @unique    // "owner/repo" normalized key
+  status     String   @default("analyzing") // "analyzing" | "done" | "error"
+  result     Json?               // VerepoResponse + meta (native JSON)
+  error      String?
+  filesCount Int      @default(0)
+  totalLines Int      @default(0)
+  analyzedBy String?             // wallet pubkey or IP
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ── Verepo: Daily Usage Tracking ──
+model VerepoUsage {
+  id        String   @id @default(cuid())
+  key       String              // wallet pubkey or "ip:xxx.xxx.xxx.xxx"
+  type      String              // "wallet" | "ip"
+  date      String              // "2026-02-19" (UTC date for daily bucket)
+  count     Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([key, type, date])
 }
