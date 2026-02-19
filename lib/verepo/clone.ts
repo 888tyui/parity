@@ -85,11 +85,18 @@ export async function cloneAndExtract(repoUrl: string): Promise<CloneResult> {
 
 
         // Download tarball
+        const headers: Record<string, string> = {
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "Parity-Verepo/1.0",
+        };
+        // Use GitHub token if available (60/hr → 5000/hr rate limit)
+        const ghToken = process.env.GITHUB_TOKEN;
+        if (ghToken) {
+            headers["Authorization"] = `Bearer ${ghToken}`;
+        }
+
         const res = await fetch(tarballUrl, {
-            headers: {
-                "Accept": "application/vnd.github+json",
-                "User-Agent": "Parity-Verepo/1.0",
-            },
+            headers,
             redirect: "follow",
         });
 
