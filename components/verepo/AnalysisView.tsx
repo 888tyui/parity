@@ -119,42 +119,42 @@ export default function AnalysisView({ result, onReset }: AnalysisViewProps) {
                     </p>
                 </motion.div>
 
-                {/* ── 3-column: Category / Quality / Slop ── */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    {/* Category Card */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.15 }}
-                        className="glass-card rounded-xl p-5 depth-card"
-                    >
-                        <h4 className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary uppercase tracking-wider mb-3">
-                            What Is This?
-                        </h4>
-                        <p className="font-[family-name:var(--font-cs-caleb-mono)] text-lg text-text-primary">
-                            {category.type}
-                        </p>
-                        <p className="mt-1 text-xs font-[family-name:var(--font-dm-sans)] text-text-secondary">
-                            {category.framework} · {category.language}
-                        </p>
-                        <div className="editorial-rule-blue mt-3 mb-3" />
-                        <p className="text-sm font-[family-name:var(--font-dm-sans)] text-text-secondary leading-relaxed">
-                            {category.description}
-                        </p>
-                        {category.features.length > 0 && (
-                            <div className="mt-3 flex flex-wrap gap-1.5">
-                                {category.features.map((f) => (
-                                    <span
-                                        key={f}
-                                        className="px-2.5 py-0.5 text-[11px] font-[family-name:var(--font-cs-caleb-mono)] bg-blue-light/20 text-blue-deep rounded-full"
-                                    >
-                                        {f}
-                                    </span>
-                                ))}
-                            </div>
-                        )}
-                    </motion.div>
+                {/* ── Category (full-width) ── */}
+                <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 }}
+                    className="glass-card rounded-xl p-5 depth-card"
+                >
+                    <h4 className="text-xs font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary uppercase tracking-wider mb-3">
+                        What Is This?
+                    </h4>
+                    <p className="font-[family-name:var(--font-cs-caleb-mono)] text-lg text-text-primary">
+                        {category.type}
+                    </p>
+                    <p className="mt-1 text-xs font-[family-name:var(--font-dm-sans)] text-text-secondary">
+                        {category.framework} · {category.language}
+                    </p>
+                    <div className="editorial-rule-blue mt-3 mb-3" />
+                    <p className="text-sm font-[family-name:var(--font-dm-sans)] text-text-secondary leading-relaxed">
+                        {category.description}
+                    </p>
+                    {category.features.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-1.5">
+                            {category.features.map((f) => (
+                                <span
+                                    key={f}
+                                    className="px-2.5 py-0.5 text-[11px] font-[family-name:var(--font-cs-caleb-mono)] bg-blue-light/20 text-blue-deep rounded-full"
+                                >
+                                    {f}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+                </motion.div>
 
+                {/* ── Quality + Slop (2-column) ── */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {/* Quality Card */}
                     <motion.div
                         initial={{ opacity: 0, y: 16 }}
