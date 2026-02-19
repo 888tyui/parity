@@ -9,6 +9,14 @@ description: Railway + Prisma + PostgreSQL 배포 시 주의사항 & 체크리�
 ### 1. Build vs Runtime — DB 접근 분리
 Railway 빌드 컨테이너에서는 **내부 DB에 접근 불가** (`postgres.railway.internal`은 런타임에서만 resolve됨).
 
+### 1.5. 시스템 의존성 (nixpacks.toml)
+`simple-git` 등 시스템 바이너리가 필요하면 `nixpacks.toml`에 추가:
+```toml
+[phases.setup]
+aptPkgs = ["git"]
+```
+> ⚠️ 없으면 `spawn git ENOENT` 에러 발생
+
 ```json
 {
   "build": "prisma generate && next build",
