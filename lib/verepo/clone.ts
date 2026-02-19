@@ -11,6 +11,7 @@ import { extract as tarExtract } from "tar";
 import type { CloneResult, SourceFile } from "./types";
 
 const MAX_LINES = 10000;
+const MAX_TARBALL_BYTES = 50 * 1024 * 1024; // 50MB tarball download limit
 
 // Source file extensions to include
 const SOURCE_EXTENSIONS = new Set([
@@ -66,6 +67,7 @@ export async function cloneAndExtract(repoUrl: string): Promise<CloneResult> {
 
         console.log(`[verepo] Downloading tarball: ${tarballUrl}`);
 
+
         // Download tarball
         const res = await fetch(tarballUrl, {
             headers: {
@@ -79,11 +81,30 @@ export async function cloneAndExtract(repoUrl: string): Promise<CloneResult> {
             throw new Error(`GitHub API error: ${res.status} ${res.statusText}`);
         }
 
+        // Layer 1: Check Content-Length header if available
+        const contentLength = parseInt(res.headers.get("content-length") || "0");
+        if (contentLength > MAX_TARBALL_BYTES) {
+            throw new Error(`REPO_TOO_HEAVY:${Math.round(contentLength / 1024 / 1024)}`);
+        }
+
+        // Layer 2: Stream byte limiter (Content-Length isn't always accurate/present)
+        let bytesReceived = 0;
+        const limitedStream = new TransformStream({
+            transform(chunk, controller) {
+                bytesReceived += chunk.byteLength;
+                if (bytesReceived > MAX_TARBALL_BYTES) {
+                    controller.error(new Error(`REPO_TOO_HEAVY:${Math.round(bytesReceived / 1024 / 1024)}`));
+                    return;
+                }
+                controller.enqueue(chunk);
+            },
+        });
+
         // Extract tarball to tmpDir
         // GitHub tarballs have a root dir like "owner-repo-sha/", we strip 1 level
         await pipeline(
             // @ts-expect-error — ReadableStream vs NodeJS.ReadableStream
-            res.body,
+            res.body.pipeThrough(limitedStream),
             createGunzip(),
             tarExtract({ cwd: tmpDir, strip: 1 }),
         );

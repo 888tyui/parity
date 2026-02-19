@@ -132,6 +132,18 @@ export async function POST(req: NextRequest) {
                     413
                 );
             }
+            if (err instanceof Error && err.message.startsWith("REPO_TOO_HEAVY")) {
+                const sizeMB = parseInt(err.message.split(":")[1]) || 0;
+                await prisma.verepoResult.update({
+                    where: { repoKey },
+                    data: { status: "error", error: "TOO_HEAVY" },
+                });
+                return errorResponse(
+                    `Repository download is ${sizeMB}MB+, exceeding the 50MB limit. This usually means the repo contains large binary files. Verepo only analyzes source code repositories.`,
+                    "TOO_LARGE",
+                    413
+                );
+            }
             console.error("[verepo] Clone failed:", err);
             await prisma.verepoResult.update({
                 where: { repoKey },
