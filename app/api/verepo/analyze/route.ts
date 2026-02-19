@@ -3,7 +3,7 @@
 // ========================================
 
 import { NextRequest, NextResponse } from "next/server";
-import { validateRepoUrl, cloneAndExtract, extractRepoName } from "@/lib/verepo/clone";
+import { validateRepoUrl, cloneAndExtract, extractRepoName, fetchLatestSha } from "@/lib/verepo/clone";
 import { analyzeWithClaude } from "@/lib/verepo/analyze";
 import { checkRateLimit, recordUsage } from "@/lib/verepo/rate-limit";
 import { verifyWalletSignature } from "@/lib/verepo/verify-wallet";
@@ -57,11 +57,24 @@ export async function POST(req: NextRequest) {
 
         if (cached) {
             if (cached.status === "done" && cached.result) {
-                // Return cached result — no rate limit charge
-                return NextResponse.json({
-                    ...(cached.result as Record<string, unknown>),
-                    cached: true,
-                });
+                // Check if code has been updated since last analysis
+                const latestSha = await fetchLatestSha(repoUrl);
+                if (latestSha && cached.commitSha && latestSha === cached.commitSha) {
+                    // Code unchanged — return cached result (no cost)
+                    return NextResponse.json({
+                        ...(cached.result as Record<string, unknown>),
+                        cached: true,
+                    });
+                }
+                if (!latestSha) {
+                    // Can't fetch SHA (rate limit?) — return cached anyway
+                    return NextResponse.json({
+                        ...(cached.result as Record<string, unknown>),
+                        cached: true,
+                    });
+                }
+                // SHA changed — fall through to re-analyze
+                console.log(`[verepo] SHA changed for ${repoKey}: ${cached.commitSha?.slice(0, 7)} → ${latestSha.slice(0, 7)}, re-analyzing`);
             }
 
             if (cached.status === "analyzing") {
@@ -206,6 +219,8 @@ export async function POST(req: NextRequest) {
                 result: JSON.parse(JSON.stringify(responseData)),
                 filesCount: cloneResult.files.length,
                 totalLines: cloneResult.totalLines,
+                commitSha: cloneResult.commitSha,
+                tokenCount: cloneResult.tokenCount,
             },
         });
 

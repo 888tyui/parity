@@ -60,4 +60,6 @@ export interface CloneResult {
     files: SourceFile[];
     totalLines: number;
     repoName: string;
+    commitSha: string | null;
+    tokenCount: number;
 }

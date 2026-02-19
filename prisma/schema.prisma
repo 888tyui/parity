@@ -69,11 +69,13 @@ model VerepoResult {
   repoOwner  String              // e.g. "solana-labs"
   repoName   String              // e.g. "example-helloworld"
   repoKey    String   @unique    // "owner/repo" normalized key
+  commitSha  String?             // Latest HEAD SHA — used for cache invalidation
   status     String   @default("analyzing") // "analyzing" | "done" | "error"
   result     Json?               // VerepoResponse + meta (native JSON)
   error      String?
   filesCount Int      @default(0)
   totalLines Int      @default(0)
+  tokenCount Int      @default(0)  // Estimated input tokens sent to LLM
   analyzedBy String?             // wallet pubkey or IP
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

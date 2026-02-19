@@ -12,6 +12,7 @@ import type { CloneResult, SourceFile } from "./types";
 
 const MAX_LINES = 25000;
 const MAX_TARBALL_BYTES = 50 * 1024 * 1024; // 50MB tarball download limit
+const MAX_TOKENS = 128_000; // ~128K token cap — prevents runaway costs (~$0.38 input max)
 
 // Source file extensions to include
 const SOURCE_EXTENSIONS = new Set([
@@ -67,6 +68,39 @@ function parseGitHubUrl(url: string): { owner: string; repo: string } {
     const clean = url.replace(/\/$/, "").replace(/\.git$/, "");
     const parts = clean.split("/");
     return { owner: parts[parts.length - 2], repo: parts[parts.length - 1] };
+}
+
+/**
+ * Fetch latest HEAD commit SHA from GitHub API.
+ * Returns null on failure (non-blocking — analysis proceeds without SHA).
+ */
+export async function fetchLatestSha(repoUrl: string): Promise<string | null> {
+    try {
+        const { owner, repo } = parseGitHubUrl(repoUrl);
+        const headers: Record<string, string> = {
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "Parity-Verepo/1.0",
+        };
+        const ghToken = process.env.GITHUB_TOKEN;
+        if (ghToken) headers["Authorization"] = `Bearer ${ghToken}`;
+
+        const res = await fetch(
+            `https://api.github.com/repos/${owner}/${repo}/commits?per_page=1`,
+            { headers }
+        );
+        if (!res.ok) return null;
+        const commits = await res.json();
+        return commits[0]?.sha ?? null;
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * Rough token count estimate: ~4 chars per token for code.
+ */
+function estimateTokens(text: string): number {
+    return Math.ceil(text.length / 4);
 }
 
 /**
@@ -185,10 +219,23 @@ export async function cloneAndExtract(repoUrl: string): Promise<CloneResult> {
 
         walk(tmpDir, tmpDir);
 
+        // Estimate tokens from all file contents
+        const allContent = files.map(f => `--- ${f.path} ---\n${f.content}`).join("\n");
+        const tokenCount = estimateTokens(allContent);
+
+        if (tokenCount > MAX_TOKENS) {
+            throw new Error(`TOO_LARGE:${totalLines} (estimated ${Math.round(tokenCount / 1000)}K tokens)`);
+        }
+
+        // Fetch HEAD commit SHA
+        const commitSha = await fetchLatestSha(repoUrl);
+
         return {
             files,
             totalLines,
             repoName: extractRepoName(repoUrl),
+            commitSha,
+            tokenCount,
         };
     } finally {
         // Clean up tmp directory

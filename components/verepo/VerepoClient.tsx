@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
@@ -51,6 +52,9 @@ export default function VerepoClient() {
     const walletAddress = publicKey?.toBase58();
     const [walletSig, setWalletSig] = useState<WalletSignature | null>(null);
     const [sigPending, setSigPending] = useState(false);
+    const [shareTooltip, setShareTooltip] = useState(false);
+    const searchParams = useSearchParams();
+    const router = useRouter();
 
     // Fetch usage info when wallet connects
     const fetchUsage = useCallback(async () => {
@@ -72,13 +76,39 @@ export default function VerepoClient() {
         fetchUsage();
     }, [fetchUsage]);
 
-    // Sign message when wallet connects
+    // Auto-load shared result from URL ?repo= param
     useEffect(() => {
-        console.log("[WALLET DEBUG] useEffect fired:", { connected, hasSignMessage: !!signMessage, walletAddress, sigPending, hasWalletSig: !!walletSig });
-        if (!connected || !signMessage || !walletAddress || sigPending) {
-            console.log("[WALLET DEBUG] Skipping sign — missing:", { connected, hasSignMessage: !!signMessage, walletAddress, sigPending });
-            return;
-        }
+        const repoParam = searchParams.get("repo");
+        if (!repoParam || phase !== "input") return;
+
+        const loadSharedResult = async () => {
+            setPhase("loading");
+            setState((s) => ({ ...s, repoUrl: `https://github.com/${repoParam}` }));
+            try {
+                const res = await fetch(`/api/verepo/status?repo=${encodeURIComponent(repoParam)}`);
+                const data = await res.json();
+                if (data.status === "done" && data.data) {
+                    setState((s) => ({ ...s, result: data.data, cached: true }));
+                    setPhase("result");
+                } else if (data.status === "analyzing") {
+                    setState((s) => ({ ...s, repoKey: repoParam }));
+                    setPhase("polling");
+                    startPolling(repoParam);
+                } else {
+                    // No cached result — go back to input
+                    setPhase("input");
+                    router.replace("/verepo", { scroll: false });
+                }
+            } catch {
+                setPhase("input");
+            }
+        };
+        loadSharedResult();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        if (!connected || !signMessage || !walletAddress || sigPending) return;
         // Already have a valid signature
         if (walletSig && (Date.now() - walletSig.timestamp) < SIGNATURE_TTL) {
             console.log("[WALLET DEBUG] Already have valid sig, skipping");
@@ -192,6 +222,11 @@ export default function VerepoClient() {
             setState((s) => ({ ...s, result: data, cached: !!data.cached }));
             setPhase("result");
             fetchUsage();
+            // Update URL for sharing
+            const repoKey = data.meta?.repoName || "";
+            if (repoKey) {
+                router.replace(`/verepo?repo=${encodeURIComponent(repoKey)}`, { scroll: false });
+            }
         } catch {
             setState((s) => ({ ...s, error: "Network error. Please try again." }));
             setPhase("error");
@@ -202,6 +237,7 @@ export default function VerepoClient() {
         if (pollRef.current) clearInterval(pollRef.current);
         setState({ repoUrl: "", repoKey: "", result: null, error: null, cached: false });
         setPhase("input");
+        router.replace("/verepo", { scroll: false });
     };
 
     // Show remaining scans only when wallet is connected
@@ -231,15 +267,33 @@ export default function VerepoClient() {
                     )}
                 </>}
                 rightContent={phase !== "input" ? (
-                    <button
-                        onClick={handleReset}
-                        className="flex items-center gap-1.5 text-[11px] font-[family-name:var(--font-dm-sans)] text-text-secondary hover:text-text-primary transition-colors"
-                    >
-                        <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5">
-                            <path d="M1 1l10 10M11 1L1 11" />
-                        </svg>
-                        <span className="hidden sm:inline">New Scan</span>
-                    </button>
+                    <div className="flex items-center gap-3">
+                        {phase === "result" && (
+                            <button
+                                onClick={() => {
+                                    navigator.clipboard.writeText(window.location.href);
+                                    setShareTooltip(true);
+                                    setTimeout(() => setShareTooltip(false), 2000);
+                                }}
+                                className="flex items-center gap-1.5 text-[11px] font-[family-name:var(--font-dm-sans)] text-text-secondary hover:text-text-primary transition-colors"
+                            >
+                                <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                    <rect x="6" y="6" width="8" height="8" rx="1.5" />
+                                    <path d="M10 6V3.5A1.5 1.5 0 008.5 2h-5A1.5 1.5 0 002 3.5v5A1.5 1.5 0 003.5 10H6" />
+                                </svg>
+                                <span className="hidden sm:inline">{shareTooltip ? "Copied!" : "Share"}</span>
+                            </button>
+                        )}
+                        <button
+                            onClick={handleReset}
+                            className="flex items-center gap-1.5 text-[11px] font-[family-name:var(--font-dm-sans)] text-text-secondary hover:text-text-primary transition-colors"
+                        >
+                            <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                <path d="M1 1l10 10M11 1L1 11" />
+                            </svg>
+                            <span className="hidden sm:inline">New Scan</span>
+                        </button>
+                    </div>
                 ) : (
                     <div className="flex items-center gap-3">
                         {/* Remaining scans — only visible after wallet connect */}
@@ -311,6 +365,9 @@ export default function VerepoClient() {
                             </p>
                             <p className="mt-2 text-xs font-[family-name:var(--font-dm-sans)] text-text-secondary max-w-[300px] leading-relaxed">
                                 Cloning repo, extracting source files, and running deep code analysis...
+                            </p>
+                            <p className="mt-1 text-[10px] font-[family-name:var(--font-cs-caleb-mono)] text-text-secondary/60">
+                                Usually takes 20–60 seconds
                             </p>
                         </div>
                     </motion.div>
