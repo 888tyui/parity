@@ -35,8 +35,9 @@ function WalletDebugger() {
 
   // Check if Phantom is available in window
   useEffect(() => {
-    const phantom = (window as Record<string, unknown>).phantom as Record<string, unknown> | undefined;
-    const solana = (window as Record<string, unknown>).solana as Record<string, unknown> | undefined;
+    const w = window as unknown as Record<string, unknown>;
+    const phantom = w.phantom as Record<string, unknown> | undefined;
+    const solana = w.solana as Record<string, unknown> | undefined;
     console.log("[WALLET DEBUG] Browser check:", {
       hasPhantom: !!phantom,
       hasPhantomSolana: !!phantom?.solana,
