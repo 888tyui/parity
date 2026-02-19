@@ -12,7 +12,7 @@ import type { CloneResult, SourceFile } from "./types";
 
 const MAX_LINES = 25000;
 const MAX_TARBALL_BYTES = 50 * 1024 * 1024; // 50MB tarball download limit
-const MAX_TOKENS = 128_000; // ~128K token cap — prevents runaway costs (~$0.38 input max)
+const MAX_TOKENS = 500_000; // ~500K token safety cap ($1.50 input max)
 
 // Source file extensions to include
 const SOURCE_EXTENSIONS = new Set([
@@ -224,7 +224,7 @@ export async function cloneAndExtract(repoUrl: string): Promise<CloneResult> {
         const tokenCount = estimateTokens(allContent);
 
         if (tokenCount > MAX_TOKENS) {
-            throw new Error(`TOO_LARGE:${totalLines} (estimated ${Math.round(tokenCount / 1000)}K tokens)`);
+            throw new Error(`TOO_MANY_TOKENS:${totalLines}:${Math.round(tokenCount / 1000)}`);
         }
 
         // Fetch HEAD commit SHA

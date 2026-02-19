@@ -157,6 +157,20 @@ export async function POST(req: NextRequest) {
                     413
                 );
             }
+            if (err instanceof Error && err.message.startsWith("TOO_MANY_TOKENS")) {
+                const parts = err.message.split(":");
+                const lines = parseInt(parts[1]) || 0;
+                const kTokens = parseInt(parts[2]) || 0;
+                await prisma.verepoResult.update({
+                    where: { repoKey },
+                    data: { status: "error", error: "TOO_MANY_TOKENS", totalLines: lines },
+                });
+                return errorResponse(
+                    `Repository source code is too large for analysis (~${kTokens}K tokens from ${lines.toLocaleString()} lines). Try a smaller repository.`,
+                    "TOO_LARGE",
+                    413
+                );
+            }
             console.error("[verepo] Clone failed:", err);
             await prisma.verepoResult.update({
                 where: { repoKey },
