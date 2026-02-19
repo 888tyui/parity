@@ -15,16 +15,32 @@ const MAX_TARBALL_BYTES = 50 * 1024 * 1024; // 50MB tarball download limit
 
 // Source file extensions to include
 const SOURCE_EXTENSIONS = new Set([
-    ".rs", ".ts", ".tsx", ".js", ".jsx",
-    ".py", ".go", ".sol", ".move",
-    ".toml", ".json", ".yaml", ".yml",
+    // Systems / blockchain
+    ".rs", ".sol", ".move", ".go", ".c", ".cpp", ".h",
+    // Web / app
+    ".ts", ".tsx", ".js", ".jsx", ".css", ".scss", ".html",
+    // Scripting
+    ".py", ".rb", ".php", ".sh",
+    // Data / config
+    ".toml", ".json", ".yaml", ".yml", ".sql", ".proto",
+    // JVM / mobile
+    ".java", ".kt", ".swift",
+    // Documentation
+    ".md",
+]);
+
+// Skip these filenames regardless of extension
+const SKIP_FILES = new Set([
+    "package-lock.json", "yarn.lock", "pnpm-lock.yaml",
+    "composer.lock", "Cargo.lock", "Gemfile.lock",
+    "poetry.lock", "go.sum",
 ]);
 
 // Directories to skip
 const SKIP_DIRS = new Set([
     "node_modules", ".git", "target", "dist", "build",
     ".next", "__pycache__", ".venv", "vendor",
-    "pkg", "artifacts",
+    "pkg", "artifacts", ".turbo", "coverage",
 ]);
 
 /**
@@ -120,6 +136,7 @@ export async function cloneAndExtract(repoUrl: string): Promise<CloneResult> {
 
             for (const entry of entries) {
                 if (SKIP_DIRS.has(entry.name)) continue;
+                if (SKIP_FILES.has(entry.name)) continue;
 
                 const fullPath = path.join(dir, entry.name);
                 const relPath = path.relative(relativeTo, fullPath).replace(/\\/g, "/");
@@ -134,8 +151,19 @@ export async function cloneAndExtract(repoUrl: string): Promise<CloneResult> {
                     const stat = fs.statSync(fullPath);
                     if (stat.size > 100 * 1024) continue;
 
-                    const content = fs.readFileSync(fullPath, "utf-8");
-                    const lineCount = content.split("\n").length;
+                    const raw = fs.readFileSync(fullPath, "utf-8");
+
+                    // Truncate long lines (>500 chars) — likely inline data/SVG/base64
+                    const MAX_LINE_CHARS = 500;
+                    const lines = raw.split("\n");
+                    const processed = lines.map((line) => {
+                        if (line.length > MAX_LINE_CHARS) {
+                            return `${line.slice(0, MAX_LINE_CHARS)} /* [TRUNCATED: ${line.length.toLocaleString()} chars — inline data] */`;
+                        }
+                        return line;
+                    });
+                    const content = processed.join("\n");
+                    const lineCount = lines.length;
 
                     totalLines += lineCount;
                     files.push({ path: relPath, content, lines: lineCount });
