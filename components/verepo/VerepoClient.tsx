@@ -74,20 +74,28 @@ export default function VerepoClient() {
 
     // Sign message when wallet connects
     useEffect(() => {
-        if (!connected || !signMessage || !walletAddress || sigPending) return;
+        console.log("[WALLET DEBUG] useEffect fired:", { connected, hasSignMessage: !!signMessage, walletAddress, sigPending, hasWalletSig: !!walletSig });
+        if (!connected || !signMessage || !walletAddress || sigPending) {
+            console.log("[WALLET DEBUG] Skipping sign — missing:", { connected, hasSignMessage: !!signMessage, walletAddress, sigPending });
+            return;
+        }
         // Already have a valid signature
-        if (walletSig && (Date.now() - walletSig.timestamp) < SIGNATURE_TTL) return;
+        if (walletSig && (Date.now() - walletSig.timestamp) < SIGNATURE_TTL) {
+            console.log("[WALLET DEBUG] Already have valid sig, skipping");
+            return;
+        }
 
         const doSign = async () => {
             setSigPending(true);
+            console.log("[WALLET DEBUG] Requesting signature...");
             try {
                 const timestamp = Date.now();
                 const message = new TextEncoder().encode(`${SIGN_MESSAGE_PREFIX}${timestamp}`);
                 const sig = await signMessage(message);
+                console.log("[WALLET DEBUG] Signature received!", sig.length, "bytes");
                 setWalletSig({ signature: bs58.encode(sig), timestamp });
             } catch (err) {
-                console.error("Wallet signature rejected:", err);
-                // User rejected — disconnect? Just clear sig
+                console.error("[WALLET DEBUG] Signature REJECTED:", err);
                 setWalletSig(null);
             } finally {
                 setSigPending(false);

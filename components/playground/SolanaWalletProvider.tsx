@@ -25,7 +25,7 @@ export default function SolanaWalletProvider({
   const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
 
   const onError = useCallback((error: WalletError, adapter?: Adapter) => {
-    console.error("Wallet error:", error.name, error.message, adapter?.name);
+    console.error("[WALLET DEBUG] onError:", error.name, error.message, adapter?.name);
   }, []);
 
   return (
