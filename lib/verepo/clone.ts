@@ -10,7 +10,7 @@ import { createGunzip } from "zlib";
 import { extract as tarExtract } from "tar";
 import type { CloneResult, SourceFile } from "./types";
 
-const MAX_LINES = 10000;
+const MAX_LINES = 25000;
 const MAX_TARBALL_BYTES = 50 * 1024 * 1024; // 50MB tarball download limit
 
 // Source file extensions to include

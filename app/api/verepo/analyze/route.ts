@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
                     data: { status: "error", error: "TOO_LARGE", totalLines: actualLines },
                 });
                 return errorResponse(
-                    `Repository has ${actualLines.toLocaleString()}+ lines of source code, exceeding the 10,000 line limit. Try a smaller repository.`,
+                    `Repository has ${actualLines.toLocaleString()}+ lines of source code, exceeding the 25,000 line limit. Try a smaller repository.`,
                     "TOO_LARGE",
                     413
                 );
