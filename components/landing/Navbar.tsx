@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-const prtCa = process.env.NEXT_PUBLIC_PRT_CA || "";
+
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [showPrtToast, setShowPrtToast] = useState(false);
+
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -16,11 +16,7 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const handlePrtClick = () => {
-    if (prtCa) return; // will navigate via <a> tag
-    setShowPrtToast(true);
-    setTimeout(() => setShowPrtToast(false), 3000);
-  };
+
 
   return (
     <nav
@@ -103,34 +99,11 @@ export default function Navbar() {
             >
               Docs
             </Link>
-            {prtCa ? (
-              <a
-                href={`https://pump.fun/coin/${prtCa}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="nav-link text-sm text-blue-primary hover:text-blue-deep transition-colors duration-300 font-[family-name:var(--font-cs-caleb-mono)] cursor-pointer"
-              >
-                $PRT
-              </a>
-            ) : (
-              <button
-                onClick={handlePrtClick}
-                className="nav-link text-sm text-blue-primary hover:text-blue-deep transition-colors duration-300 font-[family-name:var(--font-cs-caleb-mono)] cursor-pointer"
-              >
-                $PRT
-              </button>
-            )}
+
           </div>
         </div>
       </div>
-      {/* $PRT toast */}
-      {showPrtToast && (
-        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 glass-strong rounded-lg px-5 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.08)] animate-fade-in-up">
-          <p className="text-sm text-text-primary font-[family-name:var(--font-dm-sans)] whitespace-nowrap">
-            $PRT token details will be announced soon.
-          </p>
-        </div>
-      )}
+
     </nav>
   );
 }

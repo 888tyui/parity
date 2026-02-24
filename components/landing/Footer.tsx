@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,12 +10,9 @@ import GradientOrb from "@/components/ui/GradientOrb";
 export default function Footer() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const [showPrtToast, setShowPrtToast] = useState(false);
 
-  const handlePrtClick = () => {
-    setShowPrtToast(true);
-    setTimeout(() => setShowPrtToast(false), 3000);
-  };
+
+
 
   return (
     <footer ref={ref} className="relative overflow-hidden">
@@ -111,23 +108,11 @@ export default function Footer() {
               >
                 GitHub
               </a>
-              <button
-                onClick={handlePrtClick}
-                className="nav-link text-sm text-blue-primary hover:text-blue-deep transition-colors duration-300 font-[family-name:var(--font-cs-caleb-mono)] cursor-pointer"
-              >
-                $PRT
-              </button>
+
             </div>
 
 
-            {/* $PRT toast */}
-            {showPrtToast && (
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 glass-strong rounded-lg px-5 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.08)] animate-fade-in-up">
-                <p className="text-sm text-text-primary font-[family-name:var(--font-dm-sans)] whitespace-nowrap">
-                  $PRT token details will be announced soon.
-                </p>
-              </div>
-            )}
+
 
             {/* Copyright */}
             <p className="text-xs text-text-secondary font-[family-name:var(--font-dm-sans)]">
