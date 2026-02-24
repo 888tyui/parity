@@ -108,7 +108,14 @@ export default function Footer() {
               >
                 GitHub
               </a>
-
+              <a
+                href="https://pump.fun/coin/3CSAGzvKMWSm8YBsVumYUk1eN5TwpsReTiLje6Q5pump"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="nav-link text-sm text-blue-primary hover:text-blue-deep transition-colors duration-300 font-[family-name:var(--font-cs-caleb-mono)] cursor-pointer"
+              >
+                $PRT
+              </a>
             </div>
 
 
